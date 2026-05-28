@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kerby's Birthday</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #DA291C;
+      --black: #000;
+      --white: #fff;
+      --gray: #111;
+      --mid: #222;
+      --muted: #555;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Barlow Condensed', sans-serif;
+      background: var(--black);
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* ── INTRO PAGE ── */
+    #intro-page {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.7s ease, visibility 0.7s ease;
+      overflow: hidden;
+    }
+
+    #intro-page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 60px,
+        rgba(255,255,255,0.018) 60px,
+        rgba(255,255,255,0.018) 61px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 60px,
+        rgba(255,255,255,0.018) 60px,
+        rgba(255,255,255,0.018) 61px
+      );
+      pointer-events: none;
+    }
+
+    #intro-page.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .intro-inner {
+      position: relative;
+      width: min(680px, 94vw);
+      padding: 70px 60px 60px;
+      border: 1.5px solid #2a2a2a;
+      background: #0a0a0a;
+      text-align: left;
+    }
+
+    .intro-inner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 6px;
+      height: 100%;
+      background: var(--red);
+    }
+
+    .intro-inner::after {
+      content: 'KERBY 2026';
+      position: absolute;
+      bottom: 20px;
+      right: 28px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 6px;
+      color: #2a2a2a;
+    }
+
+    .intro-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 8px;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      margin-left: 2px;
+    }
+
+    .intro-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(54px, 9vw, 96px);
+      color: var(--white);
+      line-height: 0.9;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    .intro-headline span {
+      color: var(--red);
+    }
+
+    .intro-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(14px, 2.5vw, 18px);
+      font-weight: 300;
+      color: #666;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 52px;
+    }
+
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: var(--red);
+      margin-bottom: 40px;
+    }
+
+    .question-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 5px;
+      color: #444;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .choice-btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 5px;
+      border: none;
+      cursor: pointer;
+      padding: 18px 52px;
+      transition: all 0.18s ease;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .choice-btn svg {
+      flex-shrink: 0;
+    }
+
+    .yes-btn {
+      background: var(--red);
+      color: var(--white);
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    }
+
+    .yes-btn:hover {
+      background: #ff3522;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(218,41,28,0.4);
+    }
+
+    .no-btn {
+      background: transparent;
+      color: #aaa;
+      border: 1.5px solid #555;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    }
+
+    .no-btn:hover {
+      color: var(--white);
+      border-color: #888;
+      transform: translateY(-2px);
+    }
+
+    /* ── MEME OVERLAY ── */
+    .meme-sticker {
+      position: fixed;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: clamp(200px, 30vw, 350px);
+      height: auto;
+      z-index: 1001;
+      display: none;
+      object-fit: contain;
+      animation: jiggle 0.5s ease-in-out infinite;
+      border-radius: 12px;
+      border: 3px solid var(--red);
+    }
+
+    .meme-sticker.show { display: block; }
+
+    @keyframes jiggle {
+      0%,100% { transform: translate(-50%, -50%) rotate(-4deg) scale(1); }
+      50% { transform: translate(-50%, -50%) rotate(4deg) scale(1.05); }
+    }
+
+    .meme-text {
+      position: fixed;
+      top: 72%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--black);
+      border: 1.5px solid var(--red);
+      padding: 14px 28px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(18px, 3vw, 26px);
+      letter-spacing: 4px;
+      color: var(--white);
+      z-index: 1001;
+      display: none;
+      text-align: center;
+      white-space: nowrap;
+      max-width: 90vw;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    }
+
+    .meme-text.show {
+      display: block;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ── MAIN PAGE ── */
+    #main-page {
+      display: none;
+      min-height: 100vh;
+      background: var(--black);
+      position: relative;
+    }
+
+    #main-page.show { display: block; }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .hero-banner {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+      padding: 80px 60px;
+    }
+
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 55%;
+      height: 140%;
+      background: #0d0d0d;
+      transform: skewX(-8deg);
+      border-left: 3px solid #1a1a1a;
+    }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--red);
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 680px;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 10px;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 2px;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+
+    .hero-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(80px, 15vw, 180px);
+      color: var(--white);
+      line-height: 0.85;
+      letter-spacing: 4px;
+      margin-bottom: 0;
+    }
+
+    .hero-bday {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 6vw, 72px);
+      color: var(--red);
+      letter-spacing: 8px;
+      line-height: 1;
+      margin-bottom: 40px;
+    }
+
+    .hero-tagline {
+      font-family: 'Barlow', sans-serif;
+      font-size: clamp(13px, 2vw, 16px);
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: #444;
+      text-transform: uppercase;
+      margin-bottom: 64px;
+    }
+
+    .big-number {
+      position: absolute;
+      right: 8%;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(180px, 28vw, 380px);
+      color: rgba(255,255,255,0.03);
+      line-height: 1;
+      letter-spacing: -10px;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+
+    /* ── DETAIL CARDS ── */
+    .details-section {
+      position: relative;
+      z-index: 2;
+      background: #090909;
+      border-top: 1px solid #1a1a1a;
+      padding: 80px 60px;
+    }
+
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 10px;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #1a1a1a;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2px;
+    }
+
+    .detail-card {
+      background: #0f0f0f;
+      border: 1px solid #1a1a1a;
+      padding: 40px 36px;
+      position: relative;
+      transition: background 0.2s ease;
+      overflow: hidden;
+    }
+
+    .detail-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--red);
+      transition: width 0.3s ease;
+    }
+
+    .detail-card:hover { background: #131313; }
+    .detail-card:hover::before { width: 100%; }
+
+    .card-icon {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .card-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--red);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .card-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .card-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(28px, 4vw, 42px);
+      color: var(--white);
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .card-sub {
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--muted);
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    /* ── FOOTER STRIP ── */
+    .footer-strip {
+      position: relative;
+      z-index: 2;
+      background: var(--red);
+      padding: 28px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-strip p {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 6px;
+      color: var(--white);
+    }
+
+    .footer-icons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .footer-icons svg {
+      width: 22px;
+      height: 22px;
+      stroke: rgba(255,255,255,0.85);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── MUSIC BTN ── */
+    .music-control {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--black);
+      border: 1.5px solid #2a2a2a;
+      border-radius: 0;
+      width: 58px;
+      height: 58px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      z-index: 1000;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    }
+
+    .music-control svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--white);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.2s;
+    }
+
+    .music-control:hover {
+      background: var(--red);
+      border-color: var(--red);
+      transform: scale(1.08);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .hero-banner { padding: 60px 28px; }
+      .details-section { padding: 60px 28px; }
+      .footer-strip { padding: 24px 28px; }
+      .intro-inner { padding: 50px 32px 48px; }
+      .btn-row { flex-direction: column; align-items: flex-start; }
+      .choice-btn { width: 100%; justify-content: center; }
+      .big-number { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <audio id="bg-music" loop>
+    <source src="birthdaysong.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <div id="intro-page">
+    <div class="intro-inner">
+      <p class="intro-eyebrow">You're on the list</p>
+      <h1 class="intro-headline">KERBY'S<br><span>BIRTHDAY</span></h1>
+      <p class="intro-sub">May 30 &nbsp;·&nbsp; 2026</p>
+      <div class="divider"></div>
+      <p class="question-label">Are you coming?</p>
+      <div class="btn-row">
+        <button class="choice-btn yes-btn" id="yes-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          YES, I'M IN
+        </button>
+        <button class="choice-btn no-btn" id="no-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          NO
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <img class="meme-sticker" id="meme-sticker" src="" alt="Meme">
+  <div class="meme-text" id="meme-text">COME ON BRO</div>
+
+  <div id="main-page">
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="hero-banner">
+      <div class="bg-grid"></div>
+      <div class="big-number">21</div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">You're officially invited</p>
+        <h1 class="hero-name">KERBY</h1>
+        <p class="hero-bday">BIRTHDAY</p>
+        <p class="hero-tagline">Turning 21 · An unforgettable night · May 2026</p>
+      </div>
+    </div>
+
+    <div class="details-section">
+      <p class="section-label">Event Details</p>
+      <div class="cards-grid">
+        <div class="detail-card">
+          <span class="card-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </span>
+          <div class="card-label">Date</div>
+          <div class="card-value">Saturday<br>May 29, 2026</div>
+        </div>
+        <div class="detail-card">
+          <span class="card-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <div class="card-label">Time</div>
+          <div class="card-value">2:00 PM<br>— 12:00 PM</div>
+        </div>
+        <div class="detail-card">
+          <span class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </span>
+          <div class="card-label">Location</div>
+          <div class="card-value">Nasugbu<br>Batangas</div>
+          <div class="card-sub">Berts Resort, Nasugbu, Batangas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-strip">
+      <p>SEE YOU THERE &nbsp;·&nbsp; DON'T BE LATE</p>
+      <span class="footer-icons">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"/><line x1="2" y1="21" x2="22" y2="21"/><path d="M7 8v2"/><path d="M12 8v2"/><path d="M17 8v2"/><path d="M7 4h.01"/><path d="M12 4h.01"/><path d="M17 4h.01"/></svg>
+        <svg viewBox="0 0 24 24"><path d="m5.8 11.3-1.9 8.4 8.4-1.9L21 9l-6-6z"/><path d="m5.8 11.3 5.2 5.2"/><path d="m2 21 3-3"/><path d="M17.5 3.5 20 6"/><path d="M15 5 12.5 2.5"/><path d="M21.5 8.5 19 11"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+      </span>
+    </div>
+  </div>
+
+  <button class="music-control" id="music-control" title="Toggle music">
+    <svg id="icon-muted" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+    <svg id="icon-sound" viewBox="0 0 24 24" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+  </button>
+
+  <script>
+    const introPage  = document.getElementById('intro-page');
+    const mainPage   = document.getElementById('main-page');
+    const yesBtn     = document.getElementById('yes-btn');
+    const noBtn      = document.getElementById('no-btn');
+    const memeImg    = document.getElementById('meme-sticker');
+    const memeTxt    = document.getElementById('meme-text');
+    const musicBtn   = document.getElementById('music-control');
+    const iconMuted  = document.getElementById('icon-muted');
+    const iconSound  = document.getElementById('icon-sound');
+    const bgMusic    = document.getElementById('bg-music');
+
+    let playing = false;
+
+    const messages = [
+      "UY PUNTA KA NAMAN",
+      "MAY LIBRENG PAGKAIN BRO",
+      "SAYANG NAMAN",
+      "PAKIUSAP NA BRO",
+      "LALABAN KA PA BA",
+      "WALA KANG TAKAS",
+      "HALA DI MO NA MA-CLICK",
+      "PUNTA KA NA KASI",
+      "MAGSASAMA KA LANG",
+      "COME ON BRO PLEASE"
+    ];
+
+    const gifs = [
+      'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDdtczNsdTIya3Zna2RqbThsMmRuY3RtY2ZxOG9oejI2dG1ieG11eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2fHywJ1uXRuHm/giphy.gif',
+      'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNW9lNzFvb2doNTVqZmlwenJzOHE5a2R4dXloejczYmpvMDZleXZ0bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dNJrrXdK4ud21GyfLr/giphy.gif',
+      'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExczV4ZWljdmg2dGozc2dqODVtOGowYnEwN2U3MzE5ZWtwemdoa29wZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/LbzJRr7icshws/giphy.gif',
+      'https://media1.tenor.com/m/_XPZj9VANVMAAAAd/bimby-edidont.gif',
+      'https://media1.tenor.com/m/9HFO_H3ktFsAAAAd/cardo-dalisay-crying.gif',
+      'https://media1.tenor.com/m/uS539qTINooAAAAd/alden-richards-alden-twbu.gif'
+    ];
+
+    let memeTimeout;
+
+    noBtn.addEventListener('click', e => {
+      e.preventDefault();
+      const pad = 30;
+      const maxX = window.innerWidth  - noBtn.offsetWidth  - pad;
+      const maxY = window.innerHeight - noBtn.offsetHeight - pad;
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = Math.max(pad, Math.random() * maxX) + 'px';
+      noBtn.style.top  = Math.max(pad, Math.random() * maxY) + 'px';
+      noBtn.style.zIndex = '1002';
+      
+      memeImg.src = gifs[Math.floor(Math.random() * gifs.length)];
+      memeTxt.textContent = messages[Math.floor(Math.random() * messages.length)];
+      
+      memeImg.classList.add('show');
+      memeTxt.classList.add('show');
+      
+      clearTimeout(memeTimeout);
+      memeTimeout = setTimeout(() => {
+        memeImg.classList.remove('show');
+        memeTxt.classList.remove('show');
+      }, 3000);
+    });
+
+    // KAPAG NA-CLICK ANG "YES", MAG-P-PLAY ANG AUDIO (Lusot sa Autoplay Block!)
+    yesBtn.addEventListener('click', () => {
+      introPage.classList.add('hidden');
+      mainPage.classList.add('show');
+      memeImg.classList.remove('show');
+      memeTxt.classList.remove('show');
+
+      startConfetti();
+
+      // Patutunugin na ang audio dahil may user gesture na nangyari
+      bgMusic.play().then(() => {
+        playing = true;
+        iconMuted.style.display = 'none';
+        iconSound.style.display = 'block';
+      }).catch(error => {
+        console.log("Audio playback failed:", error);
+      });
+    });
+
+    // MUSIC TOGGLE BUTTON
+    musicBtn.addEventListener('click', () => {
+      if (playing) {
+        bgMusic.pause();
+        playing = false;
+        iconMuted.style.display = 'block';
+        iconSound.style.display = 'none';
+      } else {
+        bgMusic.play();
+        playing = true;
+        iconMuted.style.display = 'none';
+        iconSound.style.display = 'block';
+      }
+    });
+
+    /* ── CONFETTI ── */
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx    = canvas.getContext('2d');
+    let pieces   = [];
+    let animId   = null;
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function spawnConfetti() {
+      const colors = ['#DA291C','#ffffff','#ff6b6b','#f5f5f5','#cc0000','#aaaaaa','#ff3522'];
+      for (let i = 0; i < 220; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          w: Math.random() * 10 + 5,
+          h: Math.random() * 5 + 3,
+          vy: Math.random() * 3.5 + 1.5,
+          vx: Math.random() * 2 - 1,
+          rot: Math.random() * 360,
+          rs: Math.random() * 10 - 5,
+          alpha: 1
+        });
+      }
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let allGone = true;
+
+      pieces.forEach(p => {
+        p.y  += p.vy;
+        p.x  += p.vx;
+        p.rot += p.rs;
+
+        if (p.y > canvas.height - 60) {
+          p.alpha -= 0.04;
+        }
+
+        if (p.alpha > 0) {
+          allGone = false;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        }
+      });
+
+      if (allGone) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        cancelAnimationFrame(animId);
+        return;
+      }
+
+      animId = requestAnimationFrame(drawConfetti);
+    }
+
+    function startConfetti() {
+      spawnConfetti();
+      animId = requestAnimationFrame(drawConfetti);
+    }
+  </script>
+</body>
+</html>
